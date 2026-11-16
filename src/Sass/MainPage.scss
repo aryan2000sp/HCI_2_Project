@@ -20,6 +20,87 @@
     grid-column-end:3;
     height: 25vh;
   }
-  
+  .clickable{
+    cursor: pointer;
+    transition: transform 0.15s;
+    &:hover{ transform: scale(1.02); }
+  }
 
+}
+
+// ---------- Home layout: side menu | dashboard | quick actions ----------
+.home-layout{
+  display: grid;
+  grid-template-columns: 220px 1fr 240px;
+  align-items: start;
+
+  button{
+    font-family: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    &:hover{ background-color: rgba(variables.$primary-color, 0.2); }
+  }
+
+  .side-menu{
+    display: flex;
+    flex-direction: column;
+
+    .menu-title{
+      font-size: 2em;
+      font-weight: 800;
+      padding: 8px;
+      border-bottom: 3px solid variables.$text-color;
+    }
+    .menu-item{
+      justify-content: center;
+      font-size: 1.25em;
+      padding: 10px 4px;
+      border-bottom: 2px solid variables.$text-color;
+      &:last-child{ border-bottom: none; }
+    }
+  }
+
+  .quick-actions{
+    .quick-title{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.5em;
+      font-weight: 800;
+      margin: 0;
+      padding: 8px;
+      border-bottom: 3px solid variables.$text-color;
+    }
+    .quick-item{
+      font-size: 1.2em;
+      padding: 10px 8px;
+      border-bottom: 2px solid variables.$text-color;
+      &:last-child{ border-bottom: none; }
+      svg{ font-size: 1.3em; }
+    }
+  }
+}
+
+// ---------- Numbers on the home page cards ----------
+.main-page{
+  .pie-chart{
+    justify-content: space-around;
+    .month-summary h2{ font-size: 2em; margin: 0 0 8px; }
+  }
+  .dues, .goals{
+    overflow-y: auto; // scroll if the list gets long
+    h1{ margin: 0 0 8px; }
+  }
+  .summary-row{
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 6px 0;
+    border-bottom: 1px solid rgba(variables.$text-color, 0.3);
+  }
 }

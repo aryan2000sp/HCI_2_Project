@@ -1,0 +1,88 @@
+@use "../variables";
+
+// Layout and styles that only the Long-Term Goals page uses.
+// (Buttons, top bar and progress bar come from MonthlyGoalsPage.scss.)
+.long-term-page {
+  .goals-content {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    align-items: start;
+  }
+
+  .centered { text-align: center; }
+  .big { font-size: 24px; font-weight: 700; }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+    button { flex: 1; }
+  }
+
+  .item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .list-item {
+    border-top: 2px solid variables.$text-color;
+    padding: 10px 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    &:hover { background-color: rgba(variables.$primary-color, 0.1); }
+    &.selected { background-color: rgba(variables.$primary-color, 0.3); }
+  }
+
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 2px solid variables.$text-color;
+    border-radius: 12px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 700;
+    }
+    input {
+      font-family: inherit;
+      font-size: 1em;
+      padding: 6px;
+      border: 2px solid variables.$text-color;
+      border-radius: 8px;
+      background: white;
+    }
+  }
+
+  .goal-summary {
+    padding-bottom: 16px;
+    margin-bottom: 12px;
+    border-bottom: 3px solid variables.$text-color;
+  }
+
+  .milestones-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    h2 { flex: 1; } // takes up the leftover space so the buttons sit on the right
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    span { font-weight: 700; min-width: 48px; }
+    .progress-bar { flex: 1; }
+  }
+}
