@@ -1,106 +1,49 @@
 @use "../variables";
 
+// Only what's special about the home page. Shared styles are in Pages.scss.
 .main-page{
-  display: grid;
-  .pie-chart{
-    height: 50vh;
-    display:flex;
-    align-items:center;
-    /*justify-self: center;*/
-    grid-column-start:1;
-    grid-column-end:3; 
-  }
-  .dues{
-    grid-column-start:1;
-    grid-column-end:2;
-    height: 25vh;
-  }
-  .goals{
-    grid-column-start:2;
-    grid-column-end:3;
-    height: 25vh;
-  }
-  .clickable{
-    cursor: pointer;
-    transition: transform 0.15s;
-    &:hover{ transform: scale(1.02); }
-  }
-
-}
-
-// ---------- Home layout: side menu | dashboard | quick actions ----------
-.home-layout{
-  display: grid;
-  grid-template-columns: 220px 1fr 240px;
-  align-items: start;
-
-  button{
-    font-family: inherit;
-    background: none;
-    border: none;
-    cursor: pointer;
+  // The chart with the month's summary next to it
+  .overview{
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    &:hover{ background-color: rgba(variables.$primary-color, 0.2); }
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding: 24px;
   }
 
-  .side-menu{
-    display: flex;
-    flex-direction: column;
-
-    .menu-title{
-      font-size: 2em;
-      font-weight: 800;
-      padding: 8px;
-      border-bottom: 3px solid variables.$text-color;
+  .month-summary{
+    min-width: 240px;
+    .summary-label{ color: variables.$muted; margin: 0; }
+    .summary-big{
+      font-family: variables.$font-display;
+      font-size: 3.2rem;
+      font-weight: 700;
+      font-variant-numeric: lining-nums;
+      line-height: 1.1;
+      margin: 2px 0 14px;
     }
-    .menu-item{
-      justify-content: center;
-      font-size: 1.25em;
-      padding: 10px 4px;
-      border-bottom: 2px solid variables.$text-color;
-      &:last-child{ border-bottom: none; }
-    }
+    button{ margin-top: 14px; }
   }
 
-  .quick-actions{
-    .quick-title{
+  .summary-list{
+    margin: 0;
+    div{
       display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.5em;
-      font-weight: 800;
-      margin: 0;
-      padding: 8px;
-      border-bottom: 3px solid variables.$text-color;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 6px 0;
+      border-top: 1px solid variables.$line;
     }
-    .quick-item{
-      font-size: 1.2em;
-      padding: 10px 8px;
-      border-bottom: 2px solid variables.$text-color;
-      &:last-child{ border-bottom: none; }
-      svg{ font-size: 1.3em; }
-    }
+    dt{ color: variables.$muted; }
+    dd{ margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
   }
-}
 
-// ---------- Numbers on the home page cards ----------
-.main-page{
-  .pie-chart{
-    justify-content: space-around;
-    .month-summary h2{ font-size: 2em; margin: 0 0 8px; }
-  }
-  .dues, .goals{
-    overflow-y: auto; // scroll if the list gets long
-    h1{ margin: 0 0 8px; }
-  }
-  .summary-row{
+  .home-row{
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     gap: 12px;
-    margin: 6px 0;
-    border-bottom: 1px solid rgba(variables.$text-color, 0.3);
   }
+  .paid-name{ text-decoration: line-through; color: variables.$muted; }
 }

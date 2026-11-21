@@ -1,11 +1,15 @@
 import { PieChart } from '@mui/x-charts/PieChart'
 import '../Sass/card.scss'
+import '../Sass/Pages.scss'
 import '../Sass/MonthlyGoalsPage.scss'
 import GoalsTopBar from '../components/GoalsTopBar.jsx'
-import { itemsForMonth, total, formatDue, monthLabel } from '../data/financeData.js'
+import MonthPicker from '../components/MonthPicker.jsx'
+import { itemsForMonth, total, formatDue, formatMoney } from '../data/financeData.js'
+import { chartColors } from '../data/chartColors.js'
 
 // The data (expenses, income, month) comes from App.jsx as props.
-// onQuickAction('expense') opens the "New Expense" pop-up.
+// onQuickAction('expense') opens the "New Expense" pop-up;
+// onQuickAction('expense', item) opens it to edit that expense.
 function MonthlyGoalsPage({ onNavigate, onQuickAction, month, setMonth, expenses, income }) {
   // Only the items for the month being shown.
   const monthExpenses = itemsForMonth(expenses, month)
@@ -22,62 +26,56 @@ function MonthlyGoalsPage({ onNavigate, onQuickAction, month, setMonth, expenses
     label: `${e.title} - ${((e.amount / totalSpent) * 100).toFixed(1)}%`,
   }))
 
-  function changeMonth(step) {
-    // step is -1 for the previous month, +1 for the next month.
-    setMonth(new Date(month.getFullYear(), month.getMonth() + step, 1))
-  }
-
   return (
-    <section className='goals-page'>
-      {/* ---------- Top bar (shared with Long-Term Goals) ---------- */}
+    <section className='page monthly-goals-page'>
       <GoalsTopBar activeTab='monthlyGoals' onNavigate={onNavigate}>
-        <div className='month-picker'>
-          <button onClick={() => changeMonth(-1)} aria-label='Previous month'>‹</button>
-          <span>{monthLabel(month)}</span>
-          <button onClick={() => changeMonth(1)} aria-label='Next month'>›</button>
-        </div>
+        <MonthPicker month={month} setMonth={setMonth} />
       </GoalsTopBar>
 
       <div className='goals-content'>
         {/* ---------- Left: expenses list ---------- */}
-        <div className='expenses card-color'>
-          <div className='expenses-header'>
+        <div className='card-color'>
+          <div className='card-header'>
             <h2>Expenses</h2>
-            <button
-              className='add-button'
-              onClick={() => onQuickAction('expense')}
-              aria-label='Add expense'
-            >
-              +
-            </button>
+            <button className='primary' onClick={() => onQuickAction('expense')}>+ Add Expense</button>
           </div>
+          <p className='muted'>Click an expense to edit or delete it.</p>
 
-          <ul className='expense-list'>
-            {monthExpenses.length === 0 && <p>No expenses this month.</p>}
+          <div>
+            {monthExpenses.length === 0 && <p className='empty'>No expenses this month.</p>}
             {monthExpenses.map((e) => (
-              <li key={e.id} className='expense-item'>
-                <h3>{e.title}</h3>
-                <p>${e.amount.toFixed(2)} {formatDue(e.due)}</p>
-              </li>
+              <button key={e.id} className='row-button' onClick={() => onQuickAction('expense', e)}>
+                <span>
+                  <h3>{e.title}</h3>
+                  <p>{formatMoney(e.amount)} {formatDue(e.due)}</p>
+                </span>
+                <span className='muted'>Edit ›</span>
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
 
         {/* ---------- Right: chart and totals ---------- */}
         <div className='summary card-color'>
           {monthExpenses.length > 0 ? (
-            <PieChart series={[{ data: chartData }]} width={300} height={300} />
+            <PieChart
+              colors={chartColors}
+              series={[{ data: chartData, innerRadius: 70, paddingAngle: 2, cornerRadius: 4 }]}
+              width={420}
+              height={330}
+              slotProps={{ legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } } }}
+            />
           ) : (
-            <p>Nothing to chart yet.</p>
+            <p className='empty'>Nothing to chart yet.</p>
           )}
 
           <div className='totals'>
-            <p>Monthly Income: <strong>${monthIncome.toFixed(2)}</strong></p>
-            <p>Current Month Expenditure: <strong>${totalSpent.toFixed(2)}</strong></p>
+            <p>Monthly Income: <strong>{formatMoney(monthIncome)}</strong></p>
+            <p>Current Month Expenditure: <strong>{formatMoney(totalSpent)}</strong></p>
           </div>
 
           {/* Progress bar: the filled part is how much of the income has been spent. */}
-          <div className='progress-bar'>
+          <div className='progress-bar' role='progressbar' aria-valuenow={Math.round(percentOfIncome)} aria-valuemin={0} aria-valuemax={100}>
             <div className='progress-fill' style={{ width: `${percentOfIncome}%` }} />
           </div>
           <p className='progress-label'>{percentOfIncome.toFixed(0)}% of income spent</p>

@@ -1,3 +1,21 @@
-$primary-color: #D08303;
-$card-color:#FFEEEB;
-$text-color:#482A00;
+// ---------- Colours ----------
+$espresso: #3A2207;              // main text and the side menu
+$amber: #D08303;                 // brand colour: active page, progress, main buttons
+$amber-dark: #A86A02;            // amber hover
+$honey: #F7E2B8;                 // soft amber: selected rows, progress track
+$paper: #FFFBF5;                 // card background
+$sand: #F4E9DA;                  // page background
+$line: rgba(58, 34, 7, 0.14);    // thin dividers
+$line-strong: rgba(58, 34, 7, 0.32);
+$muted: #7A6650;                 // secondary text
+$moss: #3F7D3A;                  // money in / good
+$brick: #B3261E;                 // money out / warnings
+
+// ---------- Fonts ----------
+$font-body: 'Atkinson Hyperlegible', system-ui, sans-serif; // made for easy reading, incl. low vision
+$font-display: 'Playfair Display', Georgia, serif;           // headings and big numbers
+
+// Old names, kept so older styles still work.
+$primary-color: $amber;
+$card-color: $paper;
+$text-color: $espresso;

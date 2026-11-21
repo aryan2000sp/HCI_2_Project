@@ -1,85 +1,11 @@
 @use "../variables";
 
-.goals-page {
-  padding: 10px;
-
-  // Override the big global h1/p sizes from App.scss for this page.
-  h2 { font-size: 2.2em; font-weight: 800; margin: 0; }
-  h3 { font-size: 1.5em; font-weight: 800; margin: 0; }
-  p  { font-size: 18px; margin: 4px 0; }
-
-  button {
-    font-family: inherit;
-    font-weight: 700;
-    background: none;
-    border: 2px solid variables.$text-color;
-    border-radius: 12px;
-    padding: 8px 16px;
-    font-size: 1.1em;
-    cursor: pointer;
-    &:hover { background-color: rgba(variables.$primary-color, 0.2); }
-  }
-
-  // ---------- Top bar ----------
-  .top-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-
-    .tab.active { background-color: rgba(variables.$primary-color, 0.35); }
-
-    .top-bar-right { margin-left: auto; } // pushes the right side to the edge
-
-    .month-picker {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 1.2em;
-      button { border: none; font-size: 1.6em; padding: 0 8px; }
-    }
-  }
-
-  // ---------- Two columns: expenses | summary ----------
+// Only what's special about the Monthly Goals page. Shared styles are in Pages.scss.
+.monthly-goals-page {
   .goals-content {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
-  }
-
-  .expenses {
-    .expenses-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .add-button { font-size: 1.8em; padding: 0 14px; }
-    }
-
-    .add-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 12px 0;
-      input {
-        font-family: inherit;
-        font-size: 1em;
-        padding: 8px;
-        border: 2px solid variables.$text-color;
-        border-radius: 8px;
-        background: white;
-      }
-    }
-
-    .expense-list {
-      list-style: none;
-      padding: 0;
-      margin: 12px 0 0;
-    }
-
-    .expense-item {
-      border-top: 2px solid variables.$text-color;
-      padding: 10px 4px;
-    }
+    grid-template-columns: 1fr 1.25fr;
+    align-items: start;
   }
 
   .summary {
@@ -87,23 +13,12 @@
     flex-direction: column;
     align-items: center;
 
-    .totals { align-self: stretch; margin-top: 16px; }
-
-    .progress-bar { align-self: stretch; }
-    .progress-label { align-self: flex-end; }
-  }
-
-  // Progress bar, used on both goal pages.
-  .progress-bar {
-    height: 28px;
-    border: 2px solid variables.$text-color;
-    border-radius: 14px;
-    overflow: hidden;
-    background: white;
-  }
-  .progress-fill {
-    height: 100%;
-    background-color: variables.$primary-color;
-    transition: width 0.3s;
+    .totals {
+      align-self: stretch;
+      margin-top: 12px;
+      p { display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid variables.$line; }
+    }
+    .progress-bar { align-self: stretch; margin-top: 10px; }
+    .progress-label { align-self: flex-end; color: variables.$muted; }
   }
 }

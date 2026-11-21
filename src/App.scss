@@ -1,32 +1,70 @@
 @use "./variables";
 
-* {
-  font-family: "Playfair Display", serif;
-  color: variables.$text-color;
-  h1{
-    font-size:4em;
-    font-weight:800;
-  }
-  p{
-    font-size:20px;
-  }
-}
-
+// ---------- Fonts (files are in src/assets/fonts) ----------
 @font-face {
-  font-family: "Playfair Display", serif;
-  src:url('../assets/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('truetype');
-  font-optical-sizing: auto;
+  font-family: 'Atkinson Hyperlegible';
+  src: url('./assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2') format('woff2');
   font-weight: 400;
-  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('./assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('./assets/fonts/playfair-display-latin-wght-normal.woff2') format('woff2');
+  font-weight: 400 900; // variable font: any weight in this range
+  font-display: swap;
 }
 
-body{
-    background-color: variables.$primary-color;
-    margin: 0;
-    min-height: 100vh;
-    background-image: linear-gradient(to bottom, rgba(variables.$primary-color,0), rgba(variables.$primary-color,1));
+// ---------- Base ----------
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: variables.$sand;
+  color: variables.$espresso;
+  font-family: variables.$font-body;
+  font-size: 17px;
+  line-height: 1.5;
 }
 
+// Form controls don't inherit the font by default.
+button, input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+}
 
+// Type scale (each step about 1.25x the last)
+h1, h2, h3 {
+  font-family: variables.$font-display;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  // Playfair's default numbers dip below the line; use even-height ones for money.
+  font-variant-numeric: lining-nums;
+}
+h1 { font-size: 2.35rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.2rem; }
+p  { margin: 4px 0; }
 
+// A clear outline when moving around with the keyboard (Tab)
+:focus-visible {
+  outline: 3px solid variables.$amber;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
 
+// Chart labels use the app's font
+.MuiChartsLegend-root, .MuiChartsAxis-root text, .MuiChartsLegend-label {
+  font-family: variables.$font-body !important;
+  fill: variables.$espresso;
+}
+
+// Respect people who turn off animations in their system settings
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

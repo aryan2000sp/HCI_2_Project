@@ -1,0 +1,219 @@
+@use "../variables";
+
+// Styles shared by every page. A page's outer element gets className='page'.
+.page {
+  max-width: 1180px;
+
+  // ---------- Buttons ----------
+  // Default: a quiet outlined button. Add className='primary' for the main action.
+  button {
+    font-weight: 700;
+    font-size: 0.98rem;
+    background-color: variables.$paper;
+    border: 1px solid variables.$line-strong;
+    border-radius: 10px;
+    padding: 9px 16px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    &:hover { background-color: variables.$honey; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; background-color: variables.$paper; }
+  }
+  button.primary {
+    background-color: variables.$amber;
+    border-color: variables.$amber;
+    &:hover { background-color: variables.$amber-dark; border-color: variables.$amber-dark; }
+  }
+  .month-picker button { border: none; padding: 0; background: none; &:hover { background-color: variables.$honey; } }
+
+  // ---------- Page header: big title, controls on the right ----------
+  .page-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 8px 10px 14px;
+  }
+  .page-header-right {
+    margin-left: auto; // pushes the controls to the right edge
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  // Tabs that look like one switch (Monthly | Long-term)
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    background-color: rgba(58, 34, 7, 0.07);
+    border-radius: 12px;
+    .tab {
+      border: none;
+      background: none;
+      border-radius: 9px;
+      padding: 7px 18px;
+      &:hover { background-color: rgba(255, 255, 255, 0.6); }
+      &.active { background-color: variables.$paper; box-shadow: 0 1px 3px rgba(58, 34, 7, 0.15); }
+    }
+  }
+
+  // ---------- Layouts ----------
+  .two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .section-title { margin: 18px 10px 0; font-size: 1.15rem; }
+
+  // ---------- Number tiles (e.g. "Income $2,010") ----------
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .stat {
+    padding: 16px 20px;
+    .stat-label { font-size: 0.92rem; color: variables.$muted; }
+    .stat-value { font-family: variables.$font-display; font-size: 1.9rem; font-weight: 700; line-height: 1.2; font-variant-numeric: lining-nums tabular-nums; }
+  }
+
+  // ---------- Lists ----------
+  .item-list { list-style: none; padding: 0; margin: 0; }
+
+  .list-item {
+    border-top: 1px solid variables.$line;
+    padding: 12px 4px;
+  }
+
+  // A whole row you can click (to edit it)
+  .row-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-top: 1px solid variables.$line;
+    border-radius: 0;
+    padding: 12px 8px;
+    font-weight: 400;
+    font-size: 1rem;
+    white-space: normal;
+    &:hover { background-color: rgba(247, 226, 184, 0.5); }
+  }
+
+  .selected, .row-button.selected { background-color: variables.$honey; border-radius: 10px; }
+
+  .muted { color: variables.$muted; font-size: 0.92rem; }
+  .empty { color: variables.$muted; font-style: italic; padding: 8px 0; }
+  .list-total { text-align: right; margin-top: 12px; padding-top: 10px; border-top: 1px solid variables.$line-strong; }
+
+  // Money in is green with "+", money out red with "−", so it's never colour alone.
+  .positive { color: variables.$moss; }
+  .negative { color: variables.$brick; }
+
+  // Small pill labels like "Paid" / "Unpaid"
+  .tag {
+    display: inline-block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 999px;
+    border: 1px solid variables.$line-strong;
+    background-color: variables.$paper;
+    &.done { background-color: rgba(63, 125, 58, 0.12); border-color: rgba(63, 125, 58, 0.4); color: variables.$moss; }
+  }
+  button.tag { padding: 4px 12px; }
+  button.tag.done:hover { background-color: rgba(63, 125, 58, 0.2); }
+
+  // ---------- Progress bar ----------
+  .progress-bar {
+    display: block;
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: variables.$honey;
+  }
+  .progress-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background-color: variables.$amber;
+    transition: width 0.4s ease-out;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    > span:first-child { font-weight: 700; min-width: 44px; } // the "40%" label
+    .progress-bar { flex: 1; }
+  }
+
+  // ---------- Dues page rows: checkbox + name | amount | Paid tag | Edit ----------
+  .due-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
+    &.is-paid strong { text-decoration: line-through; color: variables.$muted; }
+  }
+  .due-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    input { width: 22px; height: 22px; accent-color: variables.$amber; }
+  }
+  .due-amount { font-weight: 700; }
+
+  // ---------- Tables (Investments, Shared Expenses) ----------
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    th { text-align: left; font-size: 0.88rem; color: variables.$muted; font-weight: 700; border-bottom: 1px solid variables.$line-strong; padding: 8px; }
+    td { border-bottom: 1px solid variables.$line; padding: 11px 8px; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    tbody tr.clickable-row { cursor: pointer; }
+    tbody tr.clickable-row:hover { background-color: rgba(247, 226, 184, 0.5); }
+  }
+
+  // ---------- Smaller bits ----------
+  .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .log-title { margin-top: 16px; font-size: 1.05rem; }
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid variables.$line;
+  }
+
+  // Spending page: name | share bar | amount
+  .spending-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 110px;
+    .progress-row { margin-top: 0; }
+    > strong { text-align: right; }
+  }
+
+  .investments-layout { grid-template-columns: 1.6fr 1fr; }
+  .centered-card { text-align: center; }
+}
+
+@media (max-width: 900px) {
+  .page .two-columns, .page .investments-layout { grid-template-columns: 1fr; }
+}
+
+// A toggle button in the header (e.g. Record History) shows when it's switched on.
+.page .page-header-right .tab.active { background-color: variables.$honey; border-color: variables.$amber; }

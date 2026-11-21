@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import '../Sass/card.scss'
-import '../Sass/MonthlyGoalsPage.scss' // shared goal page styles (top bar, buttons, progress bar)
+import '../Sass/Pages.scss'
 import '../Sass/LongTermGoalsPage.scss'
 import GoalsTopBar from '../components/GoalsTopBar.jsx'
-import { makeId } from '../data/financeData.js'
+import Modal from '../components/Modal.jsx'
+import SimpleForm from '../components/SimpleForm.jsx'
+import { makeId, todayString, formatMoney, cleanAmount } from '../data/financeData.js'
 
 // ---------- Small helper functions ----------
 
@@ -13,136 +15,117 @@ function formatDate(isoDate) {
   return `${month}/${day}/${year}`
 }
 
-// 40000 -> '$40,000'
-function formatMoney(amount) {
-  return '$' + amount.toLocaleString('en-US')
-}
-
 // How far "saved" is toward "target", as a whole number from 0 to 100.
 function percent(saved, target) {
   if (target <= 0) return 0
   return Math.min(Math.round((saved / target) * 100), 100)
 }
 
-// Empty forms, used when adding something new.
-const emptyGoalForm = { name: '', saved: '', target: '', monthly: '', by: '' }
-const emptyMilestoneForm = { target: '', by: '' }
+// ---------- Form setup ----------
 
-// goals and setGoals come from App.jsx, so savings added from the
-// home page's Quick Actions show up here too.
+const goalFields = [
+  { name: 'name', label: 'Name' },
+  { name: 'saved', label: 'Saved so far ($)', type: 'number' },
+  { name: 'target', label: 'Target ($)', type: 'number' },
+  { name: 'monthly', label: 'Contribution per month ($)', type: 'number' },
+  { name: 'by', label: 'By', type: 'date' },
+]
+
+function validateGoal(values) {
+  const target = cleanAmount(values.target)
+  if (!values.name.trim()) return 'Please enter a name.'
+  if (target === null) return 'Please enter a target above $0.'
+  if (!values.by) return 'Please pick a date.'
+  return {
+    name: values.name.trim(),
+    saved: Number(values.saved) || 0,
+    target,
+    monthly: Number(values.monthly) || 0,
+    by: values.by,
+  }
+}
+
+const milestoneFields = [
+  { name: 'target', label: 'Reach ($)', type: 'number' },
+  { name: 'by', label: 'By', type: 'date' },
+]
+
+function validateMilestone(values) {
+  const target = cleanAmount(values.target)
+  if (target === null) return 'Please enter an amount above $0.'
+  if (!values.by) return 'Please pick a date.'
+  return { target, by: values.by }
+}
+
+// goals and setGoals come from App.jsx, so savings added from
+// Quick Actions show up here too.
 function LongTermGoalsPage({ onNavigate, goals, setGoals }) {
-  const [selectedGoalId, setSelectedGoalId] = useState(1)
+  const [selectedGoalId, setSelectedGoalId] = useState(goals[0]?.id ?? null)
   const [selectedMilestoneId, setSelectedMilestoneId] = useState(null)
   const [showHistory, setShowHistory] = useState(false)
-
-  // goalFormMode: null (form hidden), 'add' or 'update'. Same idea for milestones.
-  const [goalFormMode, setGoalFormMode] = useState(null)
-  const [goalForm, setGoalForm] = useState(emptyGoalForm)
-  const [milestoneFormMode, setMilestoneFormMode] = useState(null)
-  const [milestoneForm, setMilestoneForm] = useState(emptyMilestoneForm)
+  // Which pop-up is open: null, 'addGoal', 'updateGoal', 'addMilestone' or 'updateMilestone'
+  const [popup, setPopup] = useState(null)
 
   const selectedGoal = goals.find((g) => g.id === selectedGoalId)
-
-  // ---------- Goals ----------
+  const selectedMilestone = selectedGoal?.milestones.find((m) => m.id === selectedMilestoneId)
 
   function selectGoal(id) {
     setSelectedGoalId(id)
     setSelectedMilestoneId(null)
-    setMilestoneFormMode(null)
   }
 
-  function openAddGoal() {
-    setGoalForm(emptyGoalForm)
-    setGoalFormMode('add')
+  // Change some fields of the selected goal, e.g. updateSelectedGoal({ name: 'Car' })
+  function updateSelectedGoal(changes) {
+    setGoals(goals.map((g) => (g.id === selectedGoalId ? { ...g, ...changes } : g)))
   }
 
-  function openUpdateGoal() {
-    if (!selectedGoal) return
-    // Fill the form with the selected goal's current values.
-    setGoalForm({
-      name: selectedGoal.name,
-      saved: selectedGoal.saved,
-      target: selectedGoal.target,
-      monthly: selectedGoal.monthly,
-      by: selectedGoal.by,
-    })
-    setGoalFormMode('update')
-  }
+  // ---------- Goals ----------
 
-  function saveGoal(event) {
-    event.preventDefault()
-    const values = {
-      name: goalForm.name.trim(),
-      saved: Number(goalForm.saved) || 0,
-      target: Number(goalForm.target),
-      monthly: Number(goalForm.monthly) || 0,
-      by: goalForm.by,
-    }
-    if (!values.name || !values.target || !values.by) return
-
-    if (goalFormMode === 'add') {
-      const newGoal = { id: makeId(), ...values, milestones: [] }
+  function saveGoal(values) {
+    if (popup === 'addGoal') {
+      // A starting amount counts as the first entry in the record history.
+      const history = values.saved > 0
+        ? [{ id: makeId(), date: todayString(), amount: values.saved, note: 'Starting amount' }]
+        : []
+      const newGoal = { id: makeId(), ...values, milestones: [], history }
       setGoals([...goals, newGoal])
-      setSelectedGoalId(newGoal.id)
+      selectGoal(newGoal.id)
     } else {
-      // Replace only the selected goal; keep its milestones.
-      setGoals(goals.map((g) => (g.id === selectedGoalId ? { ...g, ...values } : g)))
+      // If "saved so far" changed, record the difference in the history.
+      const difference = values.saved - selectedGoal.saved
+      const history = difference !== 0
+        ? [...selectedGoal.history, { id: makeId(), date: todayString(), amount: difference, note: 'Updated by hand' }]
+        : selectedGoal.history
+      updateSelectedGoal({ ...values, history })
     }
-    setGoalFormMode(null)
+    setPopup(null)
   }
 
   // ---------- Milestones (belong to the selected goal) ----------
 
-  // Helper: change the milestones list of the selected goal.
-  function setMilestones(newMilestones) {
-    setGoals(goals.map((g) => (g.id === selectedGoalId ? { ...g, milestones: newMilestones } : g)))
-  }
-
-  function openAddMilestone() {
-    setMilestoneForm(emptyMilestoneForm)
-    setMilestoneFormMode('add')
-  }
-
-  function openUpdateMilestone() {
-    const milestone = selectedGoal.milestones.find((m) => m.id === selectedMilestoneId)
-    if (!milestone) return
-    setMilestoneForm({ target: milestone.target, by: milestone.by })
-    setMilestoneFormMode('update')
+  function saveMilestone(values) {
+    if (popup === 'addMilestone') {
+      updateSelectedGoal({ milestones: [...selectedGoal.milestones, { id: makeId(), ...values }] })
+    } else {
+      updateSelectedGoal({
+        milestones: selectedGoal.milestones.map((m) => (m.id === selectedMilestoneId ? { ...m, ...values } : m)),
+      })
+    }
+    setPopup(null)
   }
 
   function deleteMilestone() {
-    if (!selectedMilestoneId) return
-    setMilestones(selectedGoal.milestones.filter((m) => m.id !== selectedMilestoneId))
+    updateSelectedGoal({ milestones: selectedGoal.milestones.filter((m) => m.id !== selectedMilestoneId) })
     setSelectedMilestoneId(null)
-    setMilestoneFormMode(null)
-  }
-
-  function saveMilestone(event) {
-    event.preventDefault()
-    const values = { target: Number(milestoneForm.target), by: milestoneForm.by }
-    if (!values.target || !values.by) return
-
-    if (milestoneFormMode === 'add') {
-      setMilestones([...selectedGoal.milestones, { id: makeId(), ...values }])
-    } else {
-      setMilestones(
-        selectedGoal.milestones.map((m) => (m.id === selectedMilestoneId ? { ...m, ...values } : m))
-      )
-    }
-    setMilestoneFormMode(null)
-  }
-
-  // Updates one field of a form object, e.g. updateField(setGoalForm, 'name', 'Car')
-  function updateField(setForm, field, value) {
-    setForm((form) => ({ ...form, [field]: value }))
   }
 
   return (
-    <section className='goals-page long-term-page'>
+    <section className='page long-term-page'>
       <GoalsTopBar activeTab='longTermGoals' onNavigate={onNavigate}>
         <button
           className={showHistory ? 'tab active' : 'tab'}
           onClick={() => setShowHistory(!showHistory)}
+          aria-pressed={showHistory}
         >
           Current Goal Record History
         </button>
@@ -150,120 +133,118 @@ function LongTermGoalsPage({ onNavigate, goals, setGoals }) {
 
       <div className='goals-content'>
         {/* ---------- Left: goal list ---------- */}
-        <div className='goal-list card-color'>
-          <h2 className='centered'>Goal List</h2>
+        <div className='card-color'>
+          <h2>Goal list</h2>
           <div className='button-row'>
-            <button onClick={openAddGoal}>Add Goal</button>
-            <button onClick={openUpdateGoal} disabled={!selectedGoal}>Update Goal</button>
+            <button className='primary' onClick={() => setPopup('addGoal')}>Add Goal</button>
+            <button onClick={() => setPopup('updateGoal')} disabled={!selectedGoal}>Update Goal</button>
           </div>
 
-          {goalFormMode && (
-            <form className='edit-form' onSubmit={saveGoal}>
-              <h3>{goalFormMode === 'add' ? 'New Goal' : 'Update Goal'}</h3>
-              <label>Name
-                <input value={goalForm.name} onChange={(e) => updateField(setGoalForm, 'name', e.target.value)} />
-              </label>
-              <label>Saved so far ($)
-                <input type='number' value={goalForm.saved} onChange={(e) => updateField(setGoalForm, 'saved', e.target.value)} />
-              </label>
-              <label>Target ($)
-                <input type='number' value={goalForm.target} onChange={(e) => updateField(setGoalForm, 'target', e.target.value)} />
-              </label>
-              <label>Contribution per month ($)
-                <input type='number' value={goalForm.monthly} onChange={(e) => updateField(setGoalForm, 'monthly', e.target.value)} />
-              </label>
-              <label>By
-                <input type='date' value={goalForm.by} onChange={(e) => updateField(setGoalForm, 'by', e.target.value)} />
-              </label>
-              <div className='button-row'>
-                <button type='submit'>Save</button>
-                <button type='button' onClick={() => setGoalFormMode(null)}>Cancel</button>
-              </div>
-            </form>
-          )}
-
-          <ul className='item-list'>
-            {goals.map((goal) => (
-              <li
-                key={goal.id}
-                className={goal.id === selectedGoalId ? 'list-item selected' : 'list-item'}
-                onClick={() => selectGoal(goal.id)}
-              >
+          {goals.length === 0 && <p className='empty'>No goals yet.</p>}
+          {goals.map((goal) => (
+            <button
+              key={goal.id}
+              className={goal.id === selectedGoalId ? 'row-button selected' : 'row-button'}
+              onClick={() => selectGoal(goal.id)}
+              aria-pressed={goal.id === selectedGoalId}
+            >
+              <span>
                 <h3>{goal.name}</h3>
                 <p>By: {formatDate(goal.by)}</p>
                 <p>{percent(goal.saved, goal.target)}% Complete</p>
-              </li>
-            ))}
-          </ul>
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* ---------- Right: selected goal details ---------- */}
-        {showHistory ? (
-          <div className='goal-detail card-color'>
-            <h2>Record History</h2>
-            <p>Coming soon.</p>
+        {/* ---------- Right: the selected goal ---------- */}
+        {!selectedGoal ? (
+          <div className='card-color'>
+            <p className='empty'>Select or add a goal.</p>
           </div>
-        ) : selectedGoal ? (
-          <div className='goal-detail card-color'>
+        ) : showHistory ? (
+          <div className='card-color'>
+            <h2>{selectedGoal.name}: record history</h2>
+            <p className='muted'>Every time money was added to this goal.</p>
+            {selectedGoal.history.length === 0 && <p className='empty'>Nothing recorded yet.</p>}
+            {[...selectedGoal.history].reverse().map((entry) => (
+              <div key={entry.id} className='list-item history-row'>
+                <span>{entry.date}</span>
+                <span>{entry.note}</span>
+                <span className={entry.amount >= 0 ? 'positive' : 'negative'}>
+                  {entry.amount >= 0 ? '+' : '−'}{formatMoney(Math.abs(entry.amount))}
+                </span>
+              </div>
+            ))}
+            <p className='history-total'>Now saved: <strong>{formatMoney(selectedGoal.saved)}</strong></p>
+          </div>
+        ) : (
+          <div className='card-color'>
             <div className='goal-summary'>
               <h2>{selectedGoal.name}</h2>
               <p className='big'>{formatMoney(selectedGoal.saved)} out of {formatMoney(selectedGoal.target)}</p>
               <p>{percent(selectedGoal.saved, selectedGoal.target)}% Complete</p>
-              <p>Contributing ${selectedGoal.monthly.toFixed(2)} per month</p>
+              <p>Contributing {formatMoney(selectedGoal.monthly)} per month</p>
               <p>By: {formatDate(selectedGoal.by)}</p>
               <ProgressRow value={percent(selectedGoal.saved, selectedGoal.target)} />
             </div>
 
             {/* ---------- Milestones ---------- */}
-            <div className='milestones-header'>
+            <div className='card-header'>
               <h2>Milestones</h2>
-              <button onClick={openAddMilestone}>Add New</button>
-              <button onClick={openUpdateMilestone} disabled={!selectedMilestoneId}>Update</button>
-              <button onClick={deleteMilestone} disabled={!selectedMilestoneId}>Delete</button>
+              <div className='button-row'>
+                <button onClick={() => setPopup('addMilestone')}>Add New</button>
+                <button onClick={() => setPopup('updateMilestone')} disabled={!selectedMilestone}>Update</button>
+                <button onClick={deleteMilestone} disabled={!selectedMilestone}>Delete</button>
+              </div>
             </div>
+            <p className='muted'>Click a milestone to select it.</p>
 
-            {milestoneFormMode && (
-              <form className='edit-form' onSubmit={saveMilestone}>
-                <h3>{milestoneFormMode === 'add' ? 'New Milestone' : 'Update Milestone'}</h3>
-                <label>Reach ($)
-                  <input type='number' value={milestoneForm.target} onChange={(e) => updateField(setMilestoneForm, 'target', e.target.value)} />
-                </label>
-                <label>By
-                  <input type='date' value={milestoneForm.by} onChange={(e) => updateField(setMilestoneForm, 'by', e.target.value)} />
-                </label>
-                <div className='button-row'>
-                  <button type='submit'>Save</button>
-                  <button type='button' onClick={() => setMilestoneFormMode(null)}>Cancel</button>
-                </div>
-              </form>
-            )}
-
-            <ul className='item-list'>
-              {selectedGoal.milestones.length === 0 && <p>No milestones yet.</p>}
-              {selectedGoal.milestones.map((ms, index) => {
-                // A milestone's progress is how much of the goal's saved money reaches its target.
-                const progress = percent(selectedGoal.saved, ms.target)
-                return (
-                  <li
-                    key={ms.id}
-                    className={ms.id === selectedMilestoneId ? 'list-item selected' : 'list-item'}
-                    onClick={() => setSelectedMilestoneId(ms.id)}
-                  >
-                    <h3>MS{index + 1} - {progress >= 100 ? 'Complete' : 'In Progress'}</h3>
-                    <p>Reach {formatMoney(ms.target)}</p>
-                    <p>By: {formatDate(ms.by)}</p>
-                    <ProgressRow value={progress} />
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ) : (
-          <div className='goal-detail card-color'>
-            <p>Select or add a goal.</p>
+            {selectedGoal.milestones.length === 0 && <p className='empty'>No milestones yet.</p>}
+            {selectedGoal.milestones.map((ms, index) => {
+              // A milestone's progress is how much of the goal's saved money reaches its target.
+              const progress = percent(selectedGoal.saved, ms.target)
+              return (
+                <button
+                  key={ms.id}
+                  className={ms.id === selectedMilestoneId ? 'row-button milestone selected' : 'row-button milestone'}
+                  onClick={() => setSelectedMilestoneId(ms.id)}
+                  aria-pressed={ms.id === selectedMilestoneId}
+                >
+                  <h3>MS{index + 1} - {progress >= 100 ? 'Complete' : 'In Progress'}</h3>
+                  <p>Reach {formatMoney(ms.target)}</p>
+                  <p>By: {formatDate(ms.by)}</p>
+                  <ProgressRow value={progress} />
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
+
+      {/* ---------- Pop-ups ---------- */}
+      {(popup === 'addGoal' || popup === 'updateGoal') && (
+        <Modal title={popup === 'addGoal' ? 'New Goal' : 'Update Goal'} onClose={() => setPopup(null)}>
+          <SimpleForm
+            fields={goalFields}
+            initialValues={popup === 'updateGoal' ? selectedGoal : {}}
+            submitLabel={popup === 'addGoal' ? 'Create Goal' : 'Save Changes'}
+            validate={validateGoal}
+            onSubmit={saveGoal}
+          />
+        </Modal>
+      )}
+      {(popup === 'addMilestone' || popup === 'updateMilestone') && (
+        <Modal title={popup === 'addMilestone' ? 'New Milestone' : 'Update Milestone'} onClose={() => setPopup(null)}>
+          <SimpleForm
+            fields={milestoneFields}
+            initialValues={popup === 'updateMilestone' ? selectedMilestone : {}}
+            submitLabel={popup === 'addMilestone' ? 'Add Milestone' : 'Save Changes'}
+            validate={validateMilestone}
+            onSubmit={saveMilestone}
+          />
+        </Modal>
+      )}
     </section>
   )
 }
@@ -271,7 +252,7 @@ function LongTermGoalsPage({ onNavigate, goals, setGoals }) {
 // "40%" label followed by a progress bar.
 function ProgressRow({ value }) {
   return (
-    <div className='progress-row'>
+    <div className='progress-row' role='progressbar' aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}>
       <span>{value}%</span>
       <div className='progress-bar'>
         <div className='progress-fill' style={{ width: `${value}%` }} />

@@ -1,0 +1,58 @@
+@use "../variables";
+
+// Only what's special about the Calendar page. Shared styles are in Pages.scss.
+.calendar-page {
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr)); // 7 equal columns, one per weekday
+    gap: 4px;
+  }
+
+  .weekday {
+    text-align: center;
+    color: variables.$muted;
+    font-weight: 700;
+    padding: 6px 0;
+  }
+
+  .day {
+    min-height: 96px;
+    border: 1px solid variables.$line;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background-color: white;
+
+    &.blank { border: none; background: none; }
+    &.today { border: 2px solid variables.$amber; box-shadow: 0 0 0 3px rgba(208, 131, 3, 0.2); }
+  }
+
+  .day-number { font-weight: 700; font-size: 0.95rem; }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  // Event labels. Each kind has its own colour AND a word ("Due", "Pay", "Goal").
+  .event {
+    display: inline-block;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: none;
+    white-space: normal;        // let long labels wrap inside the day box
+    overflow-wrap: anywhere;
+    &.due  { background-color: #F8DCD5; }
+    &.pay  { background-color: #DCEBD5; }
+    &.goal { background-color: variables.$honey; }
+  }
+  button.event { cursor: pointer; &:hover { outline: 2px solid variables.$text-color; } }
+}
