@@ -9,7 +9,7 @@ import { itemsForMonth, formatDue, formatMoney, monthKey } from '../data/finance
 
 // The home dashboard. The side menu and Quick Actions come from Layout.jsx.
 // The data (expenses, income, goals, debts, month) comes from App.jsx as props.
-function MainPage({ onNavigate, month, setMonth, expenses, income, goals, debts, paid }) {
+function MainPage({ onNavigate, onQuickAction, month, setMonth, expenses, income, goals, debts, paid }) {
   const monthExpenses = itemsForMonth(expenses, month)
 
   // Which preview the big chart card shows (index into previewTabs).
@@ -61,7 +61,13 @@ function MainPage({ onNavigate, month, setMonth, expenses, income, goals, debts,
                 <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
               ))}
             </dl>
-            <button onClick={() => onNavigate(preview.page)}>{preview.buttonText} ›</button>
+            <div className='summary-buttons'>
+              {/* The Spending preview can record spending right here (the "Home widget" path) */}
+              {tab.key === 'spending' && (
+                <button className='primary' onClick={() => onQuickAction('expense')}>+ Add Spending</button>
+              )}
+              <button onClick={() => onNavigate(preview.page)}>{preview.buttonText} ›</button>
+            </div>
           </div>
 
           <button className='step-arrow' onClick={() => stepTab(1)} aria-label='Next preview'>›</button>

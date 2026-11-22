@@ -25,6 +25,7 @@ function SpendingPage({ onQuickAction, month, setMonth, expenses }) {
   return (
     <section className='page'>
       <PageHeader title='Spending'>
+        <button className='primary' onClick={() => onQuickAction('expense')}>+ Add Spending</button>
         <MonthPicker month={month} setMonth={setMonth} />
       </PageHeader>
 

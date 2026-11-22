@@ -56,7 +56,7 @@
       line-height: 1.1;
       margin: 2px 0 14px;
     }
-    button{ margin-top: 14px; }
+    .summary-buttons{ display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
   }
 
   .summary-list{

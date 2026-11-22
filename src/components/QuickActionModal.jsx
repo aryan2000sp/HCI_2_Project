@@ -24,7 +24,8 @@ function validateEntry(values) {
 // The pop-up opened by Quick Actions, and by clicking an expense or income to edit it.
 // modal is { type, item }: type is 'expense', 'income' or 'savings';
 // item is the expense/income being edited, or null when adding a new one.
-function QuickActionModal({ modal, month, goals, actions, onClose }) {
+// onSwitch(type) closes this pop-up and opens a different one.
+function QuickActionModal({ modal, month, goals, actions, onSwitch, onClose }) {
   const { type, item } = modal
   const editing = Boolean(item)
 
@@ -80,6 +81,24 @@ function QuickActionModal({ modal, month, goals, actions, onClose }) {
           }}
           onSubmit={andClose((values) => actions.addSavings(values.goalId, values.amount))}
         />
+      </Modal>
+    )
+  }
+
+  // Placeholder: receipt scanning isn't built yet. The button is here so test
+  // participants can see where the feature will live (a "stub" for a sub-task).
+  if (type === 'scanReceipt') {
+    return (
+      <Modal title='Scan a Receipt' onClose={onClose}>
+        <p className='modal-note'>
+          Receipt scanning still needs to be implemented. In a future version, you'll
+          take a photo of a receipt and the expense will be filled in for you.
+        </p>
+        <p className='modal-note'>For now, you can add the expense by hand.</p>
+        <div className='modal-buttons'>
+          <button className='modal-secondary' onClick={onClose}>Close</button>
+          <button className='modal-submit' onClick={() => onSwitch('expense')} autoFocus>Add Expense Instead</button>
+        </div>
       </Modal>
     )
   }

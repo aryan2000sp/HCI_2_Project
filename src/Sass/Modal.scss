@@ -141,3 +141,21 @@
   cursor: pointer;
   &:hover { background-color: rgba(179, 38, 30, 0.08); }
 }
+
+// Plain text in a pop-up (e.g. the "not built yet" message)
+.modal-note {
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+}
+
+// A quiet outlined button next to the main one
+.modal-secondary {
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 12px 22px;
+  background: none;
+  border: 1.5px solid variables.$line-strong;
+  border-radius: 12px;
+  cursor: pointer;
+  &:hover { background-color: variables.$honey; }
+}

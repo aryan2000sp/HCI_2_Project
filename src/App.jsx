@@ -103,6 +103,7 @@ function App() {
           month={month}
           goals={goals}
           actions={actions}
+          onSwitch={openModal}
           onClose={() => setModal(null)}
         />
       )}

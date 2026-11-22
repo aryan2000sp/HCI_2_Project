@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   LuHouse, LuZap, LuX, LuWallet, LuReceipt, LuTarget, LuChartPie, LuLandmark,
-  LuSquarePlus, LuSquareMinus, LuSquareChevronDown, LuPanelLeftClose, LuPanelLeftOpen,
+  LuSquarePlus, LuSquareMinus, LuSquareChevronDown, LuScanLine, LuPanelLeftClose, LuPanelLeftOpen,
 } from 'react-icons/lu'
 import '../Sass/card.scss'
 import '../Sass/Layout.scss'
@@ -21,6 +21,7 @@ const quickActions = [
   { label: 'Add Income', icon: LuSquarePlus, type: 'income' },
   { label: 'Add Expense', icon: LuSquareMinus, type: 'expense' },
   { label: 'Add Savings', icon: LuSquareChevronDown, type: 'savings' },
+  { label: 'Scan Receipt', icon: LuScanLine, type: 'scanReceipt' }, // placeholder: not built yet
 ]
 
 // Both goal pages count as "Goals" in the menu.
