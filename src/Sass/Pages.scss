@@ -178,17 +178,6 @@
   }
   .due-amount { font-weight: 700; }
 
-  // ---------- Tables (Investments, Shared Expenses) ----------
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    th { text-align: left; font-size: 0.88rem; color: variables.$muted; font-weight: 700; border-bottom: 1px solid variables.$line-strong; padding: 8px; }
-    td { border-bottom: 1px solid variables.$line; padding: 11px 8px; }
-    .num { text-align: right; font-variant-numeric: tabular-nums; }
-    tbody tr.clickable-row { cursor: pointer; }
-    tbody tr.clickable-row:hover { background-color: rgba(247, 226, 184, 0.5); }
-  }
-
   // ---------- Smaller bits ----------
   .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
   .log-title { margin-top: 16px; font-size: 1.05rem; }
@@ -207,12 +196,10 @@
     > strong { text-align: right; }
   }
 
-  .investments-layout { grid-template-columns: 1.6fr 1fr; }
-  .centered-card { text-align: center; }
 }
 
 @media (max-width: 900px) {
-  .page .two-columns, .page .investments-layout { grid-template-columns: 1fr; }
+  .page .two-columns { grid-template-columns: 1fr; }
 }
 
 // A toggle button in the header (e.g. Record History) shows when it's switched on.

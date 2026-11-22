@@ -1,18 +1,27 @@
+import { useState } from 'react'
 import '../Sass/MainPage.scss'
 import '../Sass/card.scss'
 import '../Sass/Pages.scss'
-import BasicChart from './BasicChart.jsx'
+import { previewTabs, buildPreview } from './HomePreviews.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import MonthPicker from '../components/MonthPicker.jsx'
-import { itemsForMonth, total, formatDue, formatMoney, monthKey } from '../data/financeData.js'
+import { itemsForMonth, formatDue, formatMoney, monthKey } from '../data/financeData.js'
 
 // The home dashboard. The side menu and Quick Actions come from Layout.jsx.
-// The data (expenses, income, goals, month) comes from App.jsx as props.
-function MainPage({ onNavigate, month, setMonth, expenses, income, goals, paid }) {
+// The data (expenses, income, goals, debts, month) comes from App.jsx as props.
+function MainPage({ onNavigate, month, setMonth, expenses, income, goals, debts, paid }) {
   const monthExpenses = itemsForMonth(expenses, month)
-  const spent = total(monthExpenses)
-  const earned = total(itemsForMonth(income, month))
-  const leftOver = earned - spent
+
+  // Which preview the big chart card shows (index into previewTabs).
+  const [tabIndex, setTabIndex] = useState(0)
+  const tab = previewTabs[tabIndex]
+  const preview = buildPreview(tab.key, { month, expenses, income, goals, debts, paid })
+
+  // step is -1 (‹ arrow) or +1 (› arrow). The % wraps around, so › on the
+  // last tab goes back to the first, and ‹ on the first goes to the last.
+  function stepTab(step) {
+    setTabIndex((tabIndex + step + previewTabs.length) % previewTabs.length)
+  }
 
   return (
     <section className='page main-page'>
@@ -20,17 +29,42 @@ function MainPage({ onNavigate, month, setMonth, expenses, income, goals, paid }
         <MonthPicker month={month} setMonth={setMonth} />
       </PageHeader>
 
-      {/* ---------- This month at a glance ---------- */}
+      {/* ---------- Big chart card: tabs + arrows switch between page previews ---------- */}
       <div className='overview card-color'>
-        <BasicChart expenses={monthExpenses} total={spent} />
-        <div className='month-summary'>
-          <p className='summary-label'>Left over this month</p>
-          <p className={`summary-big ${leftOver >= 0 ? 'positive' : 'negative'}`}>{formatMoney(leftOver)}</p>
-          <dl className='summary-list'>
-            <div><dt>Income</dt><dd>{formatMoney(earned)}</dd></div>
-            <div><dt>Spent</dt><dd>{formatMoney(spent)}</dd></div>
-          </dl>
-          <button onClick={() => onNavigate('spending')}>See spending ›</button>
+        <div className='overview-top'>
+          <div className='tabs' role='group' aria-label='Choose a preview'>
+            {previewTabs.map((t, index) => (
+              <button
+                key={t.key}
+                className={index === tabIndex ? 'tab active' : 'tab'}
+                onClick={() => setTabIndex(index)}
+                aria-pressed={index === tabIndex}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <span className='muted'>{tabIndex + 1} of {previewTabs.length}</span>
+        </div>
+
+        <div className='overview-body'>
+          <button className='step-arrow' onClick={() => stepTab(-1)} aria-label='Previous preview'>‹</button>
+
+          {/* key makes React redraw the chart when the tab changes */}
+          <div className='overview-chart' key={tab.key}>{preview.chart}</div>
+
+          <div className='month-summary'>
+            <p className='summary-label'>{preview.label}</p>
+            <p className={`summary-big ${preview.tone}`}>{preview.big}</p>
+            <dl className='summary-list'>
+              {preview.rows.map(([label, value]) => (
+                <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+              ))}
+            </dl>
+            <button onClick={() => onNavigate(preview.page)}>{preview.buttonText} ›</button>
+          </div>
+
+          <button className='step-arrow' onClick={() => stepTab(1)} aria-label='Next preview'>›</button>
         </div>
       </div>
 

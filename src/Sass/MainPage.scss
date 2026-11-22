@@ -2,14 +2,47 @@
 
 // Only what's special about the home page. Shared styles are in Pages.scss.
 .main-page{
-  // The chart with the month's summary next to it
+  // The big chart card: tabs on top, then ‹ chart | summary ›
   .overview{
+    padding: 18px 20px 24px;
+  }
+
+  .overview-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .overview-body{
+    display: grid;
+    grid-template-columns: auto 1fr auto auto; // ‹ | chart | summary | ›
+    align-items: center;
+    gap: 24px;
+  }
+
+  // Fixed height so the card doesn't jump when switching tabs
+  .overview-chart{
+    min-height: 340px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 48px;
-    flex-wrap: wrap;
-    padding: 24px;
+    min-width: 0;
+    animation: preview-in 0.2s ease-out; // a quick fade shows the content changed
+  }
+
+  // Round ‹ › buttons on each side of the card
+  .step-arrow{
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
   }
 
   .month-summary{
@@ -46,4 +79,8 @@
     gap: 12px;
   }
   .paid-name{ text-decoration: line-through; color: variables.$muted; }
+}
+
+@keyframes preview-in{
+  from{ opacity: 0; }
 }

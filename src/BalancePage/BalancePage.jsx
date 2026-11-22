@@ -6,8 +6,8 @@ import Stat from '../components/Stat.jsx'
 import { itemsForMonth, total, formatMoney, formatDue } from '../data/financeData.js'
 
 // An overview of where your money stands: this month's income and spending,
-// plus savings, investments and debt.
-function BalancePage({ onQuickAction, month, setMonth, expenses, income, goals, investments, debts }) {
+// plus savings and debt.
+function BalancePage({ onQuickAction, month, setMonth, expenses, income, goals, debts }) {
   const monthIncome = itemsForMonth(income, month)
   const monthExpenses = itemsForMonth(expenses, month)
   const earned = total(monthIncome)
@@ -15,10 +15,9 @@ function BalancePage({ onQuickAction, month, setMonth, expenses, income, goals, 
   const leftOver = earned - spent
 
   const saved = goals.reduce((sum, g) => sum + g.saved, 0)
-  const invested = investments.reduce((sum, i) => sum + i.value, 0)
   const owed = debts.reduce((sum, d) => sum + d.balance, 0)
   // Net worth: what you have minus what you owe.
-  const netWorth = saved + invested - owed
+  const netWorth = saved - owed
 
   return (
     <section className='page'>
@@ -36,7 +35,6 @@ function BalancePage({ onQuickAction, month, setMonth, expenses, income, goals, 
       <h3 className='section-title'>Overall</h3>
       <div className='stat-grid'>
         <Stat label='Saved for goals' value={formatMoney(saved)} />
-        <Stat label='Investments' value={formatMoney(invested)} />
         <Stat label='Debt owed' value={formatMoney(owed)} />
         <Stat label='Net worth' value={formatMoney(netWorth)} className={netWorth >= 0 ? 'positive' : 'negative'} />
       </div>

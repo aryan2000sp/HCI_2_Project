@@ -18,7 +18,8 @@ const StyledText = styled('text')(() => ({
   fill: '#3A2207',
 }));
 
-function PieCenterLabel({ children }) {
+// Big text in the middle of a donut chart. Also used by the Home previews.
+export function PieCenterLabel({ children }) {
   const { width, height, left, top } = useDrawingArea();
   return (
     <StyledText x={left + width / 2} y={top + height / 2}>

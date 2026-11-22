@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  LuHouse, LuZap, LuX, LuWallet, LuReceipt, LuTarget, LuChartPie, LuLandmark, LuTrendingUp, LuUsers, LuCalendarDays,
+  LuHouse, LuZap, LuX, LuWallet, LuReceipt, LuTarget, LuChartPie, LuLandmark,
   LuSquarePlus, LuSquareMinus, LuSquareChevronDown, LuPanelLeftClose, LuPanelLeftOpen,
 } from 'react-icons/lu'
 import '../Sass/card.scss'
@@ -14,9 +14,6 @@ const menuItems = [
   { label: 'Goals', page: 'monthlyGoals', icon: LuTarget },
   { label: 'Spending', page: 'spending', icon: LuChartPie },
   { label: 'Debts Log', page: 'debts', icon: LuLandmark },
-  { label: 'Investments', page: 'investments', icon: LuTrendingUp },
-  { label: 'Shared Expenses', page: 'shared', icon: LuUsers },
-  { label: 'Calendar', page: 'calendar', icon: LuCalendarDays },
 ]
 
 // Right side quick actions. "type" is which pop-up form App.jsx opens.

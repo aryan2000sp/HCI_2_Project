@@ -10,13 +10,10 @@ import BalancePage from './BalancePage/BalancePage.jsx'
 import DuesPage from './DuesPage/DuesPage.jsx'
 import SpendingPage from './SpendingPage/SpendingPage.jsx'
 import DebtsPage from './DebtsPage/DebtsPage.jsx'
-import InvestmentsPage from './InvestmentsPage/InvestmentsPage.jsx'
-import SharedExpensesPage from './SharedExpensesPage/SharedExpensesPage.jsx'
-import CalendarPage from './CalendarPage/CalendarPage.jsx'
 import {
   makeId, monthKey, todayString,
   startingMonth, startingExpenses, startingIncome, startingGoals,
-  startingDebts, startingInvestments, startingShared,
+  startingDebts,
 } from './data/financeData.js'
 
 // Every page, by the name used to navigate to it (onNavigate('dues') shows DuesPage).
@@ -28,9 +25,6 @@ const pages = {
   longTermGoals: LongTermGoalsPage,
   spending: SpendingPage,
   debts: DebtsPage,
-  investments: InvestmentsPage,
-  shared: SharedExpensesPage,
-  calendar: CalendarPage,
 }
 
 function App() {
@@ -45,8 +39,6 @@ function App() {
   const [income, setIncome] = useState(startingIncome)
   const [goals, setGoals] = useState(startingGoals)
   const [debts, setDebts] = useState(startingDebts)
-  const [investments, setInvestments] = useState(startingInvestments)
-  const [shared, setShared] = useState(startingShared)
 
   // Which dues are paid. Keys look like '1-2027-01' (expense id + month),
   // so a monthly bill can be paid in January but still unpaid in February.
@@ -94,8 +86,6 @@ function App() {
     expenses, income,
     goals, setGoals,
     debts, setDebts,
-    investments, setInvestments,
-    shared, setShared,
     paid, togglePaid,
   }
 

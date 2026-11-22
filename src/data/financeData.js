@@ -149,16 +149,6 @@ export const startingGoals = [
   },
 ]
 
-// People in the household, for Shared Expenses. 'You' is the person using the app.
-export const people = ['You', 'Alex', 'Sam']
-
-// Shared expenses: who paid, and who it's split between (split evenly).
-export const startingShared = [
-  { id: 1, title: 'Internet', amount: 90, paidBy: 'You', splitWith: ['You', 'Alex', 'Sam'], date: '01/05/2027', settled: false },
-  { id: 2, title: 'Groceries run', amount: 150, paidBy: 'Alex', splitWith: ['You', 'Alex', 'Sam'], date: '01/09/2027', settled: false },
-  { id: 3, title: 'Cleaning supplies', amount: 24, paidBy: 'Sam', splitWith: ['You', 'Sam'], date: '01/12/2027', settled: true },
-]
-
 // Debts: how much was borrowed, how much is left, and a log of payments.
 export const startingDebts = [
   {
@@ -169,11 +159,4 @@ export const startingDebts = [
     id: 2, name: 'Credit Card', lender: 'Bank credit card', original: 1200, balance: 650, minPayment: 50,
     payments: [{ id: 1, date: '11/10/2026', amount: 100 }],
   },
-]
-
-// Investments: how much went in, and what it's worth now.
-export const startingInvestments = [
-  { id: 1, name: 'Index Fund', type: 'TFSA', invested: 3000, value: 3240 },
-  { id: 2, name: 'Retirement Fund', type: 'RRSP', invested: 2500, value: 2610 },
-  { id: 3, name: '1-Year GIC', type: 'GIC', invested: 1000, value: 1035 },
 ]
